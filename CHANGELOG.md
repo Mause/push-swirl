@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.5
+
+* Statistics screen reworked. Added selection of time intervals.
+* Added charts into statistics
+* Added time between dilatations into statistics
+
+
 ## v1.4
 
 * "Screen always on" while session is running

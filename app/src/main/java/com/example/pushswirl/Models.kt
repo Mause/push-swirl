@@ -78,13 +78,24 @@ data class Session(
 ) : Parcelable
 
 data class SessionStats(
-    val wmaSmallTTD: Double,
-    val wmaMediumTTD: Double,
-    val wmaLargeTTD: Double,
-    val wmaXlTTD: Double,
-    val wmaSessionLength: Double,
-    val totalSessions: Int
+    val smallTTD: Double,
+    val mediumTTD: Double,
+    val largeTTD: Double,
+    val xlTTD: Double,
+    val sessionLength: Double,
+    val totalSessions: Int,
+    val avgTimeBetweenSessions: Double  // in seconds; 0 if fewer than 2 sessions
 )
+
+enum class StatsTimeInterval(val label: String, val days: Int?) {
+    DAYS_2("2d", 2),
+    DAYS_7("7d", 7),
+    DAYS_14("14d", 14),
+    DAYS_30("30d", 30),
+    MONTHS_3("3mo", 90),
+    MONTHS_6("6mo", 180),
+    ALL("All", null)
+}
 
 data class NotificationSettings(
     val vibrationEnabled: Boolean = true,

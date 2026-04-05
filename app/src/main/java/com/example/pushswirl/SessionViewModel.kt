@@ -123,7 +123,13 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
 
     // History and stats
     var sessions by mutableStateOf(storage.loadSessions())
-    var stats by mutableStateOf(storage.calculateStats())
+    var statsTimeInterval by mutableStateOf(StatsTimeInterval.DAYS_14)
+    var stats by mutableStateOf(storage.calculateStats(StatsTimeInterval.DAYS_14.days))
+
+    fun updateStatsTimeInterval(interval: StatsTimeInterval) {
+        statsTimeInterval = interval
+        stats = storage.calculateStats(interval.days)
+    }
 
     // ============================================================================
     // HELPER FUNCTIONS - calculate time from absolute clock
@@ -485,7 +491,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
 
         // Reload data
         sessions = storage.loadSessions()
-        stats = storage.calculateStats()
+        stats = storage.calculateStats(statsTimeInterval.days)
 
         currentScreen = AppScreen.Home
         sessionState = SessionState.Idle
@@ -498,13 +504,13 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     fun deleteSession(sessionId: String) {
         storage.deleteSession(sessionId)
         sessions = storage.loadSessions()
-        stats = storage.calculateStats()
+        stats = storage.calculateStats(statsTimeInterval.days)
     }
 
     fun deleteAllSessions() {
         storage.deleteAllSessions()
         sessions = storage.loadSessions()
-        stats = storage.calculateStats()
+        stats = storage.calculateStats(statsTimeInterval.days)
     }
 
     // ============================================================================
@@ -532,7 +538,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         val result = storage.importSessionsFromUri(uri)
         // Reload data after import
         sessions = storage.loadSessions()
-        stats = storage.calculateStats()
+        stats = storage.calculateStats(statsTimeInterval.days)
         return result
     }
 
