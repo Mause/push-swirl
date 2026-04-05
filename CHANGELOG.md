@@ -3,6 +3,7 @@
 ## v1.6
 
 * Fixed "swipe back" behavior
+* Optional countdown to the next session (shown in the main menu; configured in "Settings")
 
 ## v1.5
 

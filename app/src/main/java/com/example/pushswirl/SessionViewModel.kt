@@ -46,6 +46,8 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     // App settings
     var keepScreenOn by mutableStateOf(storage.loadKeepScreenOn())
     var themeMode by mutableStateOf(storage.loadThemeMode())
+    var countdownEnabled by mutableStateOf(storage.loadCountdownEnabled())
+    var countdownIntervalMinutes by mutableIntStateOf(storage.loadCountdownIntervalMinutes())
 
     // Active session state
     var sessionState by mutableStateOf<SessionState>(SessionState.Idle)
@@ -207,6 +209,16 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     fun updateThemeMode(mode: ThemeMode) {
         themeMode = mode
         storage.saveThemeMode(mode)
+    }
+
+    fun updateCountdownEnabled(enabled: Boolean) {
+        countdownEnabled = enabled
+        storage.saveCountdownEnabled(enabled)
+    }
+
+    fun updateCountdownIntervalMinutes(minutes: Int) {
+        countdownIntervalMinutes = minutes
+        storage.saveCountdownIntervalMinutes(minutes)
     }
 
     // ============================================================================

@@ -41,6 +41,20 @@ fun HomeScreen(viewModel: SessionViewModel) {
         }
     }
 
+    // Countdown: time remaining until (lastSession + interval), negative means overdue
+    data class CountdownInfo(val label: String, val timeStr: String, val overdue: Boolean)
+    val countdown: CountdownInfo? = if (viewModel.countdownEnabled && lastSessionTimestamp != null) {
+        val targetMs = lastSessionTimestamp + viewModel.countdownIntervalMinutes * 60_000L
+        val diffMs = targetMs - currentTime
+        val diffMinutes = diffMs / 60_000
+        val absMin = Math.abs(diffMinutes)
+        val h = absMin / 60
+        val m = absMin % 60
+        val timeStr = if (h > 0) "${h}h ${m}m" else "${m}m"
+        if (diffMs >= 0) CountdownInfo("Next session in ", timeStr, false)
+        else CountdownInfo("", "$timeStr overdue", true)
+    } else null
+
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -75,6 +89,26 @@ fun HomeScreen(viewModel: SessionViewModel) {
                         )) {
                             append("$timeSinceLastSession ago")
                         }
+                    }
+                )
+            }
+
+            if (countdown != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    buildAnnotatedString {
+                        if (countdown.label.isNotEmpty()) {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                                fontSize = 15.sp
+                            )) { append(countdown.label) }
+                        }
+                        withStyle(SpanStyle(
+                            color = if (countdown.overdue) MaterialTheme.colorScheme.error
+                                    else MaterialTheme.colorScheme.primary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )) { append(countdown.timeStr) }
                     }
                 )
             }

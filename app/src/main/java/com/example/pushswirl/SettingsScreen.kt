@@ -2,11 +2,15 @@ package org.kreatrix.pushswirl
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -14,6 +18,18 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SettingsScreen(viewModel: SessionViewModel) {
     BackHandler { viewModel.navigateTo(AppScreen.Home) }
+
+    // Local editable state for interval hours/minutes to avoid saving on every keystroke
+    val intervalMinutesTotal = viewModel.countdownIntervalMinutes
+    var hoursText by remember(intervalMinutesTotal) { mutableStateOf((intervalMinutesTotal / 60).toString()) }
+    var minutesText by remember(intervalMinutesTotal) { mutableStateOf((intervalMinutesTotal % 60).toString()) }
+
+    fun commitInterval() {
+        val h = hoursText.toIntOrNull()?.coerceIn(0, 99) ?: 0
+        val m = minutesText.toIntOrNull()?.coerceIn(0, 59) ?: 0
+        val total = h * 60 + m
+        if (total > 0) viewModel.updateCountdownIntervalMinutes(total)
+    }
 
     Scaffold(
         topBar = {
@@ -36,6 +52,7 @@ fun SettingsScreen(viewModel: SessionViewModel) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             // Theme section
             Text(
@@ -97,6 +114,70 @@ fun SettingsScreen(viewModel: SessionViewModel) {
                     checked = viewModel.keepScreenOn,
                     onCheckedChange = { viewModel.updateKeepScreenOn(it) }
                 )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Countdown section
+            Text(
+                text = "Countdown",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Count down from last session", fontSize = 16.sp)
+                    Text(
+                        "Show a countdown on the home screen based on your last session",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+                Checkbox(
+                    checked = viewModel.countdownEnabled,
+                    onCheckedChange = { viewModel.updateCountdownEnabled(it) }
+                )
+            }
+
+            if (viewModel.countdownEnabled) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Interval", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = hoursText,
+                        onValueChange = { hoursText = it.filter { c -> c.isDigit() }.take(2) },
+                        label = { Text("Hours") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        trailingIcon = { Text("h", fontSize = 14.sp) }
+                    )
+                    OutlinedTextField(
+                        value = minutesText,
+                        onValueChange = { minutesText = it.filter { c -> c.isDigit() }.take(2) },
+                        label = { Text("Minutes") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        trailingIcon = { Text("m", fontSize = 14.sp) }
+                    )
+                    Button(onClick = { commitInterval() }) {
+                        Text("Set")
+                    }
+                }
             }
         }
     }

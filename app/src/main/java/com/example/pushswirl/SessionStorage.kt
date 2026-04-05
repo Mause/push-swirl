@@ -103,6 +103,22 @@ class SessionStorage(private val context: Context) {
         return ThemeMode.valueOf(name)
     }
 
+    fun saveCountdownEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean("countdown_enabled", enabled).apply()
+    }
+
+    fun loadCountdownEnabled(): Boolean {
+        return prefs.getBoolean("countdown_enabled", false)
+    }
+
+    fun saveCountdownIntervalMinutes(minutes: Int) {
+        prefs.edit().putInt("countdown_interval_minutes", minutes).apply()
+    }
+
+    fun loadCountdownIntervalMinutes(): Int {
+        return prefs.getInt("countdown_interval_minutes", 8 * 60)
+    }
+
     fun getLastDepthForSize(size: PhaseSize): Float {
         // Get the last recorded depth from sessions that have depth recorded
         val sessions = loadSessions()
