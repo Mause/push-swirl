@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.6
+
+* Fixed "swipe back" behavior
+
 ## v1.5
 
 * Statistics screen reworked. Added selection of time intervals for statistics.

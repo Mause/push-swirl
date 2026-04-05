@@ -1,5 +1,6 @@
 package org.kreatrix.pushswirl
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +23,8 @@ private val COLOR_GAP    = Color(0xFF26C6DA)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen(viewModel: SessionViewModel) {
+    BackHandler { viewModel.navigateTo(AppScreen.Home) }
+
     val stats = viewModel.stats
     val selectedInterval = viewModel.statsTimeInterval
     val sessions = viewModel.sessions

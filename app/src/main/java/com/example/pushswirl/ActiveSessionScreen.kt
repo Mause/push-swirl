@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.activity.compose.BackHandler
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +48,8 @@ fun ActiveSessionScreen(viewModel: SessionViewModel) {
     }
 
     var showCancelDialog by remember { mutableStateOf(false) }
+
+    BackHandler { showCancelDialog = true }
 
     Scaffold(
         topBar = {

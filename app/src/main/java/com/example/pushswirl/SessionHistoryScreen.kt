@@ -1,6 +1,7 @@
 package org.kreatrix.pushswirl
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,8 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionHistoryScreen(viewModel: SessionViewModel) {
+    BackHandler { viewModel.navigateTo(AppScreen.Home) }
+
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showExportOptionsDialog by remember { mutableStateOf(false) }

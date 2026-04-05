@@ -9,11 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewSessionScreen(viewModel: SessionViewModel) {
+    BackHandler { viewModel.navigateTo(AppScreen.Home) }
+
     var small by remember { mutableStateOf(viewModel.sessionConfig.small) }
     var medium by remember { mutableStateOf(viewModel.sessionConfig.medium) }
     var large by remember { mutableStateOf(viewModel.sessionConfig.large) }
