@@ -2,10 +2,10 @@
 
 ## v1.5
 
-* Statistics screen reworked. Added selection of time intervals.
+* Statistics screen reworked. Added selection of time intervals for statistics.
 * Added charts into statistics
 * Added time between dilatations into statistics
-
+* Fixed some potential crash when application is switched
 
 ## v1.4
 

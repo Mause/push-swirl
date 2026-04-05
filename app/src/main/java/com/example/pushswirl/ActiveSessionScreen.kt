@@ -2,6 +2,7 @@ package org.kreatrix.pushswirl
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.media.AudioManager
 import android.view.WindowManager
 import androidx.compose.foundation.layout.*
@@ -26,8 +27,17 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActiveSessionScreen(viewModel: SessionViewModel) {
-    val window = (LocalContext.current as Activity).window
-    DisposableEffect(viewModel.keepScreenOn) {
+    // Traverse ContextWrapper chain to find the real Activity — direct cast can fail
+    // when Android recreates the Activity after a system config change (theme, locale, etc.)
+    val context = LocalContext.current
+    val window = remember(context) {
+        var ctx: Context = context
+        while (ctx is ContextWrapper && ctx !is Activity) ctx = ctx.baseContext
+        (ctx as Activity).window
+    }
+    // Include `window` as a key so the effect re-runs if the Activity is recreated,
+    // preventing FLAG_KEEP_SCREEN_ON from being applied to a stale/destroyed window.
+    DisposableEffect(window, viewModel.keepScreenOn) {
         if (viewModel.keepScreenOn) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
