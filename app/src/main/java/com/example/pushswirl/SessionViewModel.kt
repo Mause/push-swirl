@@ -543,18 +543,61 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun cancelSession() {
-        // Stop all timers
+        ttdJob?.cancel()
+        dilationJob?.cancel()
+        stopService()
+        resetSessionState()
+        currentScreen = AppScreen.Home
+    }
+
+    fun saveAndCancelSession() {
         ttdJob?.cancel()
         dilationJob?.cancel()
 
-        // Stop service
+        // Build the in-progress phase data based on the current state
+        val partialPhase: PhaseData? = when (sessionState) {
+            is SessionState.Dilation -> {
+                val phase = activePhases[currentPhaseIndex]
+                PhaseData(
+                    size = phase,
+                    ttdSeconds = lastTtdSeconds,
+                    dilationMinutes = sessionConfig.getDuration(phase).minutes,
+                    earlyFinishSecondsRemaining = calculateDilationRemainingSeconds(),
+                    depthCm = currentPhaseDepth
+                )
+            }
+            is SessionState.DepthInput -> {
+                // Dilation already finished; save the phase without depth (not yet entered)
+                val phase = activePhases[currentPhaseIndex]
+                PhaseData(
+                    size = phase,
+                    ttdSeconds = lastTtdSeconds,
+                    dilationMinutes = sessionConfig.getDuration(phase).minutes,
+                    earlyFinishSecondsRemaining = earlyFinishSecondsRemaining,
+                    depthCm = null
+                )
+            }
+            else -> null  // TTD phase not complete — only save already-finished phases
+        }
+
+        saveSessionCheckpoint(partialPhase)
+        sessions = storage.loadSessions()
+        stats = storage.calculateStats(statsTimeInterval.days)
+
+        stopService()
+        resetSessionState()
+        currentScreen = AppScreen.Home
+    }
+
+    private fun stopService() {
         if (serviceBound) {
             getApplication<Application>().unbindService(serviceConnection)
             serviceBound = false
         }
         getApplication<Application>().stopService(Intent(getApplication(), TimerService::class.java))
+    }
 
-        // Reset state
+    private fun resetSessionState() {
         sessionState = SessionState.Idle
         completedPhases.clear()
         currentPhaseIndex = 0
@@ -570,9 +613,6 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
         dilationPaused = false
         earlyFinishSecondsRemaining = null
         currentPhaseDepth = null
-
-        // Navigate to home
-        currentScreen = AppScreen.Home
     }
 
     override fun onCleared() {

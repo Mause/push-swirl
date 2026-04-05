@@ -6,6 +6,7 @@
 * Added charts into statistics
 * Added time between dilatations into statistics
 * Fixed some potential crash when application is switched
+* In cancel session dialog added: "Save & Exit"
 
 ## v1.4
 

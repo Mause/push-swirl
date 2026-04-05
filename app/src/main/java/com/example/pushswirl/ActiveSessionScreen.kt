@@ -85,20 +85,28 @@ fun ActiveSessionScreen(viewModel: SessionViewModel) {
         AlertDialog(
             onDismissRequest = { showCancelDialog = false },
             title = { Text("Cancel Session?") },
-            text = { Text("The current session will not be saved. This action cannot be undone.") },
+            text = { Text("What would you like to do with the current session?") },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.cancelSession()
-                        showCancelDialog = false
+                Column(horizontalAlignment = Alignment.End) {
+                    TextButton(onClick = { showCancelDialog = false }) {
+                        Text("Continue Session")
                     }
-                ) {
-                    Text("Cancel Session", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showCancelDialog = false }) {
-                    Text("Continue Session")
+                    TextButton(
+                        onClick = {
+                            viewModel.saveAndCancelSession()
+                            showCancelDialog = false
+                        }
+                    ) {
+                        Text("Save & Exit")
+                    }
+                    TextButton(
+                        onClick = {
+                            viewModel.cancelSession()
+                            showCancelDialog = false
+                        }
+                    ) {
+                        Text("Discard Session", color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         )
